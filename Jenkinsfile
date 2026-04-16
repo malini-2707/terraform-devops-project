@@ -1,33 +1,13 @@
-stage('Terraform Init') {
-    steps {
-        dir('environments/dev') {
-            sh 'terraform init'
-        }
-    }
-}
+pipeline {
+    agent any
 
-stage('Terraform Validate') {
-    steps {
-        steps {
-            dir('environments/dev') {
-                sh 'terraform validate'
+    stages {
+
+        stage('Terraform Init') {
+            steps {
+                sh 'terraform init'
             }
         }
-    }
-}
 
-stage('Terraform Plan') {
-    steps {
-        dir('environments/dev') {
-            sh 'terraform plan'
-        }
-    }
-}
-
-stage('Terraform Apply') {
-    steps {
-        dir('environments/dev') {
-            sh 'terraform apply -auto-approve'
-        }
     }
 }
