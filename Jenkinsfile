@@ -11,15 +11,34 @@ pipeline {
 
         stage('Terraform Init') {
             steps {
-                sh 'terraform init'
+                dir('environments/dev') {
+                    sh 'terraform init'
+                }
+            }
+        }
+
+        stage('Terraform Validate') {
+            steps {
+                dir('environments/dev') {
+                    sh 'terraform validate'
+                }
             }
         }
 
         stage('Terraform Plan') {
             steps {
-                sh 'terraform plan'
+                dir('environments/dev') {
+                    sh 'terraform plan'
+                }
             }
         }
 
+        stage('Terraform Apply') {
+            steps {
+                dir('environments/dev') {
+                    sh 'terraform apply -auto-approve'
+                }
+            }
+        }
     }
 }
