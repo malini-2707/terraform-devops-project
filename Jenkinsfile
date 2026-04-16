@@ -1,8 +1,13 @@
 pipeline {
     agent any
 
-    stages {
+    environment {
+        AWS_ACCESS_KEY_ID     = credentials('aws-creds')
+        AWS_SECRET_ACCESS_KEY = "${env.AWS_ACCESS_KEY_ID_PSW}"
+        AWS_DEFAULT_REGION    = 'ap-south-1'
+    }
 
+    stages {
         stage('Checkout') {
             steps {
                 checkout scm
@@ -41,4 +46,10 @@ pipeline {
             }
         }
     }
-}
+
+    post {
+        always {
+            cleanWs()
+        }
+    }
+}
