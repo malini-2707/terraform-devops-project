@@ -24,14 +24,10 @@ pipeline {
             passwordVariable: 'AWS_SECRET_ACCESS_KEY'
         )]) {
             dir('environments/dev') {
-                sh '''
-                    export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
-                    export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
-                    terraform init -no-color
-                    terraform validate -no-color
-                    terraform plan -no-color
-                    terraform apply -auto-approve -no-color
-                '''
+                sh 'export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID && terraform init -no-color'
+                sh 'terraform validate -no-color'
+                sh 'terraform plan -no-color'
+                sh 'terraform apply -auto-approve -no-color'
             }
         }
     }
