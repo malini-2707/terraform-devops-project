@@ -2,22 +2,31 @@ pipeline {
     agent any
 
     environment {
-        AWS_ACCESS_KEY_ID     = credentials('aws-creds')
-        AWS_SECRET_ACCESS_KEY = "${env.AWS_ACCESS_KEY_ID_PSW}"
-        AWS_DEFAULT_REGION    = 'ap-south-1'
+        AWS_ACCESS_KEY_ID     = credentials('aws-access-key-id')
+        AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key')
     }
 
     stages {
+
+        stage('Clean Workspace') {
+            steps {
+                deleteDir()
+            }
+        }
+
         stage('Checkout') {
             steps {
-                checkout scm
+                git 'https://github.com/malini-2707/terraform-devops-project.git'
             }
         }
 
         stage('Terraform Init') {
             steps {
                 dir('environments/dev') {
-                    sh 'terraform init'
+                    sh '''
+                    rm -rf .terraform
+                    terraform init -no-color
+                    '''
                 }
             }
         }
@@ -25,7 +34,9 @@ pipeline {
         stage('Terraform Validate') {
             steps {
                 dir('environments/dev') {
-                    sh 'terraform validate'
+                    timeout(time: 2, unit: 'MINUTES') {
+                        sh 'terraform validate -no-color'
+                    }
                 }
             }
         }
@@ -33,7 +44,7 @@ pipeline {
         stage('Terraform Plan') {
             steps {
                 dir('environments/dev') {
-                    sh 'terraform plan'
+                    sh 'terraform plan -no-color'
                 }
             }
         }
@@ -41,15 +52,9 @@ pipeline {
         stage('Terraform Apply') {
             steps {
                 dir('environments/dev') {
-                    sh 'terraform apply -auto-approve'
+                    sh 'terraform apply -auto-approve -no-color'
                 }
             }
         }
     }
-
-    post {
-        always {
-            cleanWs()
-        }
-    }
-}
+}
