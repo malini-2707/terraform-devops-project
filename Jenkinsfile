@@ -11,7 +11,8 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git 'https://github.com/malini-2707/terraform-devops-project.git'
+                git branch: 'main',
+                    url: 'https://github.com/malini-2707/terraform-devops-project.git'
             }
         }
 
