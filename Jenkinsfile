@@ -8,29 +8,32 @@ pipeline {
 
     stages {
 
+        // 🧹 Clean old workspace (VERY IMPORTANT)
         stage('Clean Workspace') {
             steps {
                 deleteDir()
             }
         }
 
+        // 📥 Pull latest code from GitHub
         stage('Checkout') {
             steps {
                 git 'https://github.com/malini-2707/terraform-devops-project.git'
             }
         }
 
+        // ⚙️ Terraform Initialization
         stage('Terraform Init') {
             steps {
                 dir('environments/dev') {
                     sh '''
-                    rm -rf .terraform
                     terraform init -no-color
                     '''
                 }
             }
         }
 
+        // ✅ Validate Terraform files
         stage('Terraform Validate') {
             steps {
                 dir('environments/dev') {
@@ -41,6 +44,7 @@ pipeline {
             }
         }
 
+        // 📊 Terraform Plan
         stage('Terraform Plan') {
             steps {
                 dir('environments/dev') {
@@ -49,6 +53,7 @@ pipeline {
             }
         }
 
+        // 🚀 Terraform Apply (creates infrastructure)
         stage('Terraform Apply') {
             steps {
                 dir('environments/dev') {
