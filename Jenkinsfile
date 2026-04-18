@@ -1,63 +1,39 @@
 pipeline {
     agent any
 
-    environment {
-    AWS_ACCESS_KEY_ID     = credentials('aws-creds').username
-    AWS_SECRET_ACCESS_KEY = credentials('aws-creds').password
-}
-
     stages {
 
-        // 🧹 Clean old workspace (VERY IMPORTANT)
+        // 🧹 Clean workspace
         stage('Clean Workspace') {
             steps {
                 deleteDir()
             }
         }
 
-        // 📥 Pull latest code from GitHub
+        // 📥 Checkout code
         stage('Checkout') {
             steps {
                 git 'https://github.com/malini-2707/terraform-devops-project.git'
             }
         }
 
-        // ⚙️ Terraform Initialization
-        stage('Terraform Init') {
+        // 🔐 Terraform execution (all steps together)
+        stage('Terraform') {
             steps {
-                dir('environments/dev') {
-                    sh '''
-                    terraform init -no-color
-                    '''
-                }
-            }
-        }
+                withCredentials([usernamePassword(
+                    credentialsId: 'aws-creds',
+                    usernameVariable: 'AWS_ACCESS_KEY_ID',
+                    passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+                )]) {
 
-        // ✅ Validate Terraform files
-        stage('Terraform Validate') {
-            steps {
-                dir('environments/dev') {
-                    timeout(time: 2, unit: 'MINUTES') {
+                    dir('environments/dev') {
+
+                        sh 'terraform init -no-color'
                         sh 'terraform validate -no-color'
+                        sh 'terraform plan -no-color'
+                        sh 'terraform apply -auto-approve -no-color'
+
                     }
-                }
-            }
-        }
-
-        // 📊 Terraform Plan
-        stage('Terraform Plan') {
-            steps {
-                dir('environments/dev') {
-                    sh 'terraform plan -no-color'
-                }
-            }
-        }
-
-        // 🚀 Terraform Apply (creates infrastructure)
-        stage('Terraform Apply') {
-            steps {
-                dir('environments/dev') {
-                    sh 'terraform apply -auto-approve -no-color'
                 }
             }
         }
