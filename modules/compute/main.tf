@@ -172,7 +172,7 @@ resource "aws_instance" "web" {
               <body>
 
                 <header>
-                  <h1>🍞 Golden Crust Bake House</h1>
+                  <h1>🍞 Golden Crust Bake House 1</h1>
                   <p>Baked Fresh Every Morning — Made with Love Since 2010</p>
                 </header>
 
